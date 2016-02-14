@@ -6,5 +6,10 @@
   "author": "",
   "description": "Boxify API Service",
   "custom": {},
-  "plugins": []
+  "plugins": [
+    "serverless-lambda-prune-plugin",
+    "serverless-optimizer-plugin",
+    "serverless-resources-validation-plugin",
+    "serverless-cors-plugin"
+  ]
 }
