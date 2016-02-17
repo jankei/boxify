@@ -63,15 +63,21 @@ function create(event, cb) {
           attendance.full = attendance.slots - attendance.taken <= 1;
           attendance.taken = attendance.full ? attendance.slots : attendance.taken+1;
 
+          // this object will be the response
+          attendanceData = attendance;
+
           util.log.info("attendance status : ", attendance);
           updateAttendance(attendance, waterfallCB);
-          //waterfallCB(null, attendance);
         }
+      },
+
+      function(result, waterfallCB) {
+        createAttendee(event, waterfallCB);
       }
 
     ],
-    function(err, result) {
-      return cb(err, result);
+    function(err) {
+      return cb(err, attendanceData);
     }
   );
 }
