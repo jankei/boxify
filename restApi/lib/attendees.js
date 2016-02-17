@@ -59,6 +59,7 @@ function create(event, cb) {
           // increment taken and check if full
           // an array of one item
           var attendance = result[0];
+          if (attendance.full) return cb("400:The Slot for this Training Session is Full");
           attendance.full = attendance.slots - attendance.taken <= 1;
           attendance.taken = attendance.full ? attendance.slots : attendance.taken+1;
 
