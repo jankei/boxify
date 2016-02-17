@@ -54,6 +54,10 @@ function create(event, cb) {
         util.log.info(result);
         if (_.isEmpty(result)) {
           // create and "increment" taken by one
+          attendanceData.id = util.uuid();
+          attendanceData.taken = 1;
+          attendanceData.full = false;
+          attendanceData.createdAt = Date.now();
           createAttendanceForSlot(attendanceData, waterfallCB);
         } else {
           // increment taken and check if full
@@ -114,26 +118,16 @@ function getAttendance(selectedDate, id, cb) {
   };
   return db.query(params, cb);
 }
+
 function createAttendanceForSlot(data, cb) {
-
-  var newAttendance = {
-    "id": util.uuid(),
-    "date": data.date,
-    "slotId": data.slotId,
-    "slots": data.slots,
-    "taken": 1,
-    "full": false,
-    "createdAt": Date.now()
-  };
-
   var params = {
     TableName : config.tables.attendance,
-    Item: newAttendance
+    Item: data
   };
 
-  return db.put(params, cb, newAttendance);
-
+  return db.put(params, cb, data);
 }
+
 function createAttendee(event, cb) {
 
   var newAttendee = {
