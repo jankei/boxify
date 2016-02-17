@@ -1,69 +1,46 @@
 'use strict';
 
 module.exports = {
-  create  : create,
-  read    : read,
-  update  : update,
-  del     : del
+  read            : read,
+  getScheduleById : getScheduleById
 };
 
 var util    = require('./util');
 var db      = require('./db');
 var config  = require('./config');
 
-function create(event, cb) {
-
-  var newAttendee = {
-    "id": util.uuid(),
-    "userId": event.userId,
-    "slotId": event.slotId,
-    "attending": event.attending,
-    "createdAt": Date.now()
-  };
-
-  var params = {
-    TableName : config.tables.attendees,
-    Item: newAttendee
-  };
-
-  return db.put(params, cb, newAttendee);
+function read(event, cb) {
+  if (event.day === 'All') {
+     getWeeklySchedule(cb);
+  } else {
+     getScheduleByDay(event.day, cb);
+  }
 }
 
-function read(event, cb) {
-
+function getWeeklySchedule(cb) {
   var params = {
     TableName : config.tables.schedule,
-    Key: { id: event.id }
+    ConsistentRead: true,
+    ReturnConsumedCapacity: "TOTAL"
   };
+  return db.scan(params, cb);
+}
 
+function getScheduleByDay(selectedDay, cb) {
+  var params = {
+    TableName : config.tables.schedule,
+    IndexName: 'day-index',
+    KeyConditionExpression: '#day = :hkey',
+    ExpressionAttributeNames: { '#day' : 'day' },
+    ExpressionAttributeValues: { ':hkey': selectedDay }
+  };
+  return db.query(params, cb);
+}
+
+function getScheduleById(id, cb) {
+  var params = {
+    TableName : config.tables.schedule,
+    Key: { id: id }
+  };
   return db.get(params, cb);
-}
-
-function del(event, cb) {
-
-  var params = {
-    TableName : config.tables.attendees,
-    Key: { id: event.id },
-    ReturnValues: 'ALL_OLD'
-  };
-
-  return db.del(params, cb);
-}
-
-function update(event, cb) {
-
-  var params = {
-    TableName: config.tables.attendees,
-    Key: {
-      id: event.id
-    },
-    UpdateExpression: 'set #att = :t',
-    ExpressionAttributeNames: {'#att' : 'attending'},
-    ExpressionAttributeValues: {
-      ':t' : event.attending
-    },
-    ReturnValues: 'ALL_NEW'
-  };
-
-  return db.update(params, cb);
 }

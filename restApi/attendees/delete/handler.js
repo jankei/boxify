@@ -4,7 +4,7 @@
 var ServerlessHelpers = require('serverless-helpers-js').loadEnv();
 
 // Require Logic
-var lib = require('../../lib/schedule');
+var lib = require('../../lib/attendees');
 
 // Lambda Handler
 module.exports.handler = function(event, context) {

@@ -1,0 +1,14 @@
+{
+  "name": "schedule",
+  "version": "0.0.1",
+  "profile": "aws-0",
+  "location": "https://github.com/jankei/boxify",
+  "author": "Yaniv Keinan",
+  "description": "Scheduler Module",
+  "custom": {},
+  "cloudFormation": {
+    "lambdaIamPolicyDocumentStatements": [],
+    "resources": {}
+  },
+  "runtime": "nodejs"
+}

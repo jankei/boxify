@@ -44,7 +44,9 @@ function get(params, cb) {
 
 function query(params, cb) {
   var nStartTime = Date.now();
+  console.log(params);
   return dynamoDoc.query(params, function(err, data) {
+    console.log(err, data);
     if (_.isEmpty(data)) return cb(notFoundMsg);
     var nEndTime = Date.now();
     util.log.info('DB Query Elapsed time: ' + String(nEndTime - nStartTime) + ' milliseconds');
@@ -55,6 +57,7 @@ function query(params, cb) {
 function scan(params, cb) {
   var nStartTime = Date.now();
   return dynamoDoc.scan(params, function(err, data) {
+    console.log(err, data);
     if (_.isEmpty(data)) return cb(notFoundMsg);
     var nEndTime = Date.now();
     util.log.info('DB Scan Elapsed time: ' + String(nEndTime - nStartTime) + ' milliseconds');

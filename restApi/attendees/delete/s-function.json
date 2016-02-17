@@ -4,23 +4,23 @@
     "envVars": [],
     "optimize": true
   },
-  "handler": "schedule/read/handler.handler",
-  "name": "read",
+  "handler": "attendees/delete/handler.handler",
+  "name": "delete",
   "runtime": "nodejs",
   "timeout": 6,
   "memorySize": 1024,
   "eventSourceArn": "",
   "endpoints": [
     {
-      "path": "schedule/{day}",
-      "method": "GET",
+      "path": "attendees/{id}",
+      "method": "DELETE",
       "authorizationType": "none",
       "apiKeyRequired": true,
       "requestParameters": {
-        "integration.request.querystring.day": "method.request.querystring.day"
+        "integration.request.querystring.id": "method.request.querystring.id"
       },
       "requestTemplates": {
-        "application/json": "{\"day\":\"$input.params('day')\"}"
+        "application/json": "{\"id\":\"$input.params('id')\"}"
       },
       "responses": {
         "400": {

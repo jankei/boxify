@@ -8,9 +8,10 @@ module.exports = config;
 
 function getTables() {
   return {
-    schedule  : 'schedule',
-    attendees : 'attendees',
-    users     : 'users',
-    wod       : 'wod'
+    schedule    : 'schedule',
+    attendees   : 'attendees',
+    attendance  : 'attendance',
+    users       : 'users',
+    wod         : 'wod'
   };
 }

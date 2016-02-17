@@ -4,23 +4,23 @@
     "envVars": [],
     "optimize": true
   },
-  "handler": "schedule/update/handler.handler",
-  "name": "update",
+  "handler": "attendees/read/handler.handler",
+  "name": "read",
   "runtime": "nodejs",
   "timeout": 6,
   "memorySize": 1024,
   "eventSourceArn": "",
   "endpoints": [
     {
-      "path": "schedule/{id}",
-      "method": "PUT",
+      "path": "attendees/{id}",
+      "method": "GET",
       "authorizationType": "none",
       "apiKeyRequired": true,
       "requestParameters": {
-        "integration.request.path.id": "method.request.path.id"
+        "integration.request.querystring.id": "method.request.querystring.id"
       },
       "requestTemplates": {
-        "application/json": "{\"id\":\"$input.params('id')\", \"body\" : $input.json('$')}"
+        "application/json": "{\"id\":\"$input.params('id')\"}"
       },
       "responses": {
         "400": {

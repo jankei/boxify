@@ -4,23 +4,23 @@
     "envVars": [],
     "optimize": true
   },
-  "handler": "schedule/delete/handler.handler",
-  "name": "delete",
+  "handler": "attendees/update/handler.handler",
+  "name": "update",
   "runtime": "nodejs",
   "timeout": 6,
   "memorySize": 1024,
   "eventSourceArn": "",
   "endpoints": [
     {
-      "path": "schedule/{id}",
-      "method": "DELETE",
+      "path": "attendees/{id}",
+      "method": "PUT",
       "authorizationType": "none",
       "apiKeyRequired": true,
       "requestParameters": {
-        "integration.request.querystring.id": "method.request.querystring.id"
+        "integration.request.path.id": "method.request.path.id"
       },
       "requestTemplates": {
-        "application/json": "{\"id\":\"$input.params('id')\"}"
+        "application/json": "{\"id\":\"$input.params('id')\", \"body\" : $input.json('$')}"
       },
       "responses": {
         "400": {

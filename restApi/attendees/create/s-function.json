@@ -4,7 +4,7 @@
     "envVars": [],
     "optimize": true
   },
-  "handler": "schedule/create/handler.handler",
+  "handler": "attendees/create/handler.handler",
   "name": "create",
   "runtime": "nodejs",
   "timeout": 6,
@@ -12,7 +12,7 @@
   "eventSourceArn": "",
   "endpoints": [
     {
-      "path": "schedule",
+      "path": "attendees",
       "method": "POST",
       "authorizationType": "none",
       "apiKeyRequired": true,
