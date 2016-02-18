@@ -17,10 +17,11 @@
       "authorizationType": "none",
       "apiKeyRequired": true,
       "requestParameters": {
-        "integration.request.querystring.day": "method.request.querystring.day"
+        "integration.request.querystring.day": "method.request.querystring.day",
+        "integration.request.querystring.userId": "method.request.querystring.userId"
       },
       "requestTemplates": {
-        "application/json": "{\"day\":\"$input.params('day')\"}"
+        "application/json": "{\"day\":\"$input.params('day')\", \"userId\":\"$input.params('userId')\"}"
       },
       "responses": {
         "400": {

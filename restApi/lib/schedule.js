@@ -5,15 +5,40 @@ module.exports = {
   getScheduleById : getScheduleById
 };
 
-var util    = require('./util');
-var db      = require('./db');
-var config  = require('./config');
+var async         = require('async');
+var _             = require('underscore');
+var moment        = require('moment');
+var util          = require('./util');
+var db            = require('./db');
+var config        = require('./config');
+var attendanceLib = require('./attendance');
+var attendeesLib  = require('./attendees');
 
 function read(event, cb) {
   if (event.day === 'All') {
      getWeeklySchedule(cb);
   } else {
-     getScheduleByDay(event.day, cb);
+    var date = moment().day(event.day).format("DD.MM.YY");
+    async.parallel({
+        attendance: function(parallelCB) {
+          attendanceLib.getAttendanceForDay(date, parallelCB);
+        },
+        attendee: function(parallelCB) {
+          var attendee = {
+            date: date,
+            userId: event.userId
+          };
+          attendeesLib.getAttendeeForDay(attendee, parallelCB);
+        },
+        schedule: function(parallelCB) {
+          getScheduleByDay(event.day, parallelCB);
+        }
+      },
+      function(err, results) {
+        util.log.info("Results : ", results);
+        return cb(err, results);
+      }
+    );
   }
 }
 

@@ -1,17 +1,20 @@
 'use strict';
 
 module.exports = {
-  create  : create,
-  read    : read
+  create            : create,
+  read              : read,
+  getAttendee       : getAttendee,
+  getAttendeeForDay : getAttendeeForDay
 };
 
-var async     = require('async');
-var _         = require('underscore');
-var moment    = require('moment');
-var util      = require('./util');
-var db        = require('./db');
-var config    = require('./config');
-var schedule  = require('./schedule');
+var async           = require('async');
+var _               = require('underscore');
+var moment          = require('moment');
+var util            = require('./util');
+var db              = require('./db');
+var config          = require('./config');
+var scheduleLib     = require('./schedule');
+var attendanceLib   = require('./attendance');
 
 function create(event, cb) {
 // check attendance table for remaining slots - throw and error if none available
@@ -28,14 +31,14 @@ function create(event, cb) {
       // validate user
 
       function(waterfallCB) {
-        schedule.getScheduleById(event.slotId, waterfallCB);
+        scheduleLib.getScheduleById(event.slotId, waterfallCB);
       },
 
       function(result, waterfallCB) {
         util.log.info(result);
         attendanceData.slots = result.slots;
         attendanceData.date = moment().day(result.day).format("DD.MM.YY");
-        getAttendance(attendanceData.date, event.slotId, waterfallCB);
+        attendanceLib.getAttendance(attendanceData.date, event.slotId, waterfallCB);
       },
 
       function(result, waterfallCB) {
@@ -47,7 +50,7 @@ function create(event, cb) {
                 attendanceData.taken = 0;
                 attendanceData.full = false;
                 attendanceData.createdAt = Date.now();
-                createAttendanceForSlot(attendanceData, parallelCB);
+                attendanceLib.createAttendanceForSlot(attendanceData, parallelCB);
               } else {
                 parallelCB(null, result[0]);
               }
@@ -97,7 +100,7 @@ function create(event, cb) {
 
       function(result, waterfallCB) {
         util.log.info("attendance status : ", attendanceData);
-        updateAttendance(attendanceData, waterfallCB);
+        attendanceLib.updateAttendance(attendanceData, waterfallCB);
       }
 
     ],
@@ -105,48 +108,6 @@ function create(event, cb) {
       return cb(err, attendanceData);
     }
   );
-}
-
-function updateAttendance(attendance, cb) {
-  var params = {
-    TableName: config.tables.attendance,
-    Key: {
-      id: attendance.id,
-      date: attendance.date
-    },
-    UpdateExpression: 'set #tak = :t, #ful = :f',
-    ExpressionAttributeNames: {
-      '#ful' : 'full',
-      '#tak' : 'taken'
-    },
-    ExpressionAttributeValues: {
-      ':f' : attendance.full,
-      ':t' : attendance.taken
-    },
-    ReturnValues: 'ALL_NEW'
-  };
-
-  return db.update(params, cb);
-}
-
-function getAttendance(selectedDate, id, cb) {
-  var params = {
-    TableName : config.tables.attendance,
-    IndexName: 'date-slotId-index',
-    KeyConditionExpression: '#date = :hkey and #slotId = :skey',
-    ExpressionAttributeNames: { '#date' : 'date', '#slotId' : 'slotId' },
-    ExpressionAttributeValues: { ':hkey': selectedDate, ':skey': id }
-  };
-  return db.query(params, cb);
-}
-
-function createAttendanceForSlot(data, cb) {
-  var params = {
-    TableName : config.tables.attendance,
-    Item: data
-  };
-
-  return db.put(params, cb, data);
 }
 
 function createAttendee(attendee, cb) {
@@ -207,6 +168,24 @@ function getAttendee(attendee, cb) {
   return db.query(params, cb);
 }
 
+function getAttendeeForDay(attendee, cb) {
+  var params = {
+    TableName : config.tables.attendees,
+    IndexName: 'attendees-date-slotId-index',
+    KeyConditionExpression: '#date = :hkey',
+    FilterExpression : '#userId = :ukey',
+    ExpressionAttributeNames: {
+      '#date' : 'date',
+      '#userId' : 'userId'
+    },
+    ExpressionAttributeValues: {
+      ':hkey': attendee.date,
+      ':ukey': attendee.userId
+    }
+  };
+  return db.query(params, cb);
+}
+
 function read(event, cb) {
   var params = {
     TableName : config.tables.attendees,
@@ -214,4 +193,3 @@ function read(event, cb) {
   };
   return db.get(params, cb);
 }
-
