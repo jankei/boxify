@@ -2,9 +2,7 @@
 
 module.exports = {
   create  : create,
-  read    : read,
-  update  : update,
-  del     : del
+  read    : read
 };
 
 var async     = require('async');
@@ -217,38 +215,3 @@ function read(event, cb) {
   return db.get(params, cb);
 }
 
-// do not externalise for this version
-function del(event, cb) {
-
-  var params = {
-    TableName : config.tables.attendees,
-    Key: { id: event.id },
-    ReturnValues: 'ALL_OLD'
-  };
-
-  return db.del(params, cb);
-}
-
-function update(event, cb) {
-// check attendee record if this is update for removing or adding the attendance back
-// on adding - check attendance table for remaining slots - throw and error if none available
-  // on free slot increment and mark as full if this is last slot
-  // update the record for the attendee - attending = true
-// on removing - decrement a free slot and change status of full if it was set to true
-  // update the record for the attendee - attending = false
-
-  var params = {
-    TableName: config.tables.attendees,
-    Key: {
-      id: event.id
-    },
-    UpdateExpression: 'set #att = :t',
-    ExpressionAttributeNames: {'#att' : 'attending'},
-    ExpressionAttributeValues: {
-      ':t' : event.attending
-    },
-    ReturnValues: 'ALL_NEW'
-  };
-
-  return db.update(params, cb);
-}
