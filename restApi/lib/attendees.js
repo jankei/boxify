@@ -15,6 +15,7 @@ var db              = require('./db');
 var config          = require('./config');
 var scheduleLib     = require('./schedule');
 var attendanceLib   = require('./attendance');
+var usersLib        = require('./users');
 
 function create(event, cb) {
 // check attendance table for remaining slots - throw and error if none available
@@ -26,11 +27,17 @@ function create(event, cb) {
     slotId: event.slotId
   };
 
+  // validate user
+  var user;
+
   async.waterfall([
-
-      // validate user
-
       function(waterfallCB) {
+        usersLib.getUser(event.userId, waterfallCB);
+      },
+
+      function(result, waterfallCB) {
+        util.log.info(result);
+        user = result;
         scheduleLib.getScheduleById(event.slotId, waterfallCB);
       },
 
@@ -78,7 +85,8 @@ function create(event, cb) {
               attendee = {
                 date: attendanceData.date,
                 userId: event.userId,
-                slotId: event.slotId
+                slotId: event.slotId,
+                name: user.name
               };
               util.log.info("attendance status just before creating an attendee : ", attendanceData);
               createAttendee(attendee, waterfallCB);
@@ -117,6 +125,7 @@ function createAttendee(attendee, cb) {
     "date": attendee.date,
     "userId": attendee.userId,
     "slotId": attendee.slotId,
+    "name": attendee.name,
     "attending": true,
     "createdAt": Date.now()
   };
