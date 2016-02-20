@@ -3,7 +3,9 @@
 module.exports = {
   create            : create,
   read              : read,
+  readAttendee      : readAttendee,
   getAttendee       : getAttendee,
+  getAttendees      : getAttendees,
   getAttendeeForDay : getAttendeeForDay
 };
 
@@ -118,6 +120,14 @@ function create(event, cb) {
   );
 }
 
+function readAttendee(event, cb) {
+  var attendee = {
+    date: event.date,
+    userId: event.userId
+  };
+  getAttendeeForDay(attendee, cb);
+}
+
 function createAttendee(attendee, cb) {
 
   var newAttendee = {
@@ -172,6 +182,21 @@ function getAttendee(attendee, cb) {
       ':hkey': attendee.date,
       ':skey': attendee.slotId,
       ':ukey': attendee.userId
+    }
+  };
+  return db.query(params, cb);
+}
+
+function getAttendees(date, cb) {
+  var params = {
+    TableName : config.tables.attendees,
+    IndexName: 'attendees-date-slotId-index',
+    KeyConditionExpression: '#date = :hkey',
+    ExpressionAttributeNames: {
+      '#date' : 'date'
+    },
+    ExpressionAttributeValues: {
+      ':hkey': date
     }
   };
   return db.query(params, cb);

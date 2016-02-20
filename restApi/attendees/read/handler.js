@@ -10,7 +10,7 @@ var lib = require('../../lib/attendees');
 module.exports.handler = function(event, context) {
 
   //console.log(event, context);
-  lib.read(event, function(error, response) {
+  lib.readAttendee(event, function(error, response) {
     //console.log(error, response);
     if (error) return context.fail(error)
     else return context.done(error, response);

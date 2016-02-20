@@ -12,15 +12,16 @@
   "eventSourceArn": "",
   "endpoints": [
     {
-      "path": "attendees/{id}",
+      "path": "attendees/{date}",
       "method": "GET",
       "authorizationType": "none",
       "apiKeyRequired": true,
       "requestParameters": {
-        "integration.request.querystring.id": "method.request.querystring.id"
+        "integration.request.querystring.date": "method.request.querystring.date",
+        "integration.request.querystring.userId": "method.request.querystring.userId"
       },
       "requestTemplates": {
-        "application/json": "{\"id\":\"$input.params('id')\"}"
+        "application/json": "{\"date\":\"$input.params('date')\", \"userId\":\"$input.params('userId')\"}"
       },
       "responses": {
         "400": {

@@ -23,18 +23,20 @@ function read(event, cb) {
         attendance: function(parallelCB) {
           attendanceLib.getAttendanceForDay(date, parallelCB);
         },
-        attendee: function(parallelCB) {
-          var attendee = {
-            date: date,
-            userId: event.userId
-          };
-          attendeesLib.getAttendeeForDay(attendee, parallelCB);
+        attendees: function(parallelCB) {
+          attendeesLib.getAttendees(date, parallelCB);
         },
         schedule: function(parallelCB) {
           getScheduleByDay(event.day, parallelCB);
         }
       },
       function(err, results) {
+        var attendees = {};
+        _.each(results.attendees, function(user) {
+          attendees[user.slotId] = attendees[user.slotId] || [];
+          attendees[user.slotId].push(user.name);
+        });
+        results.attendees = attendees;
         util.log.info("Results : ", results);
         return cb(err, results);
       }
