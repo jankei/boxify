@@ -33,8 +33,10 @@ function read(event, cb) {
       function(err, results) {
         var attendees = {};
         _.each(results.attendees, function(user) {
-          attendees[user.slotId] = attendees[user.slotId] || [];
-          attendees[user.slotId].push(user.name);
+          if (user.attending) {
+            attendees[user.slotId] = attendees[user.slotId] || [];
+            attendees[user.slotId].push(user.name);
+          }
         });
         results.attendees = attendees;
         util.log.info("Results : ", results);
