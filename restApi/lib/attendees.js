@@ -46,7 +46,7 @@ function create(event, cb) {
       function(result, waterfallCB) {
         util.log.info(result);
         attendanceData.slots = result.slots;
-        attendanceData.date = moment().day(result.day).format("DD.MM.YY");
+        attendanceData.date = event.date;
         attendanceLib.getAttendance(attendanceData.date, event.slotId, waterfallCB);
       },
 
