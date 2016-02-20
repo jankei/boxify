@@ -12,16 +12,16 @@
   "eventSourceArn": "",
   "endpoints": [
     {
-      "path": "schedule/{day}",
+      "path": "schedule/{date}",
       "method": "GET",
       "authorizationType": "none",
       "apiKeyRequired": true,
       "requestParameters": {
-        "integration.request.querystring.day": "method.request.querystring.day",
+        "integration.request.querystring.date": "method.request.querystring.date",
         "integration.request.querystring.userId": "method.request.querystring.userId"
       },
       "requestTemplates": {
-        "application/json": "{\"day\":\"$input.params('day')\", \"userId\":\"$input.params('userId')\"}"
+        "application/json": "{\"date\":\"$input.params('date')\", \"userId\":\"$input.params('userId')\"}"
       },
       "responses": {
         "400": {

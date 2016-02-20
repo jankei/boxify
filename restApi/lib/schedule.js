@@ -15,10 +15,11 @@ var attendanceLib = require('./attendance');
 var attendeesLib  = require('./attendees');
 
 function read(event, cb) {
-  if (event.day === 'All') {
+  if (event.date === 'All') {
      getWeeklySchedule(cb);
   } else {
-    var date = moment().day(event.day).format("DD.MM.YY");
+    var date = moment(event.date, "DD MM YY").format("DD.MM.YY");
+    var day = moment().day(date).format("dddd");
     async.parallel({
         attendance: function(parallelCB) {
           attendanceLib.getAttendanceForDay(date, parallelCB);
@@ -27,7 +28,7 @@ function read(event, cb) {
           attendeesLib.getAttendees(date, parallelCB);
         },
         schedule: function(parallelCB) {
-          getScheduleByDay(event.day, parallelCB);
+          getScheduleByDay(day, parallelCB);
         }
       },
       function(err, results) {
