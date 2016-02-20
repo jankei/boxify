@@ -19,7 +19,7 @@ function read(event, cb) {
      getWeeklySchedule(cb);
   } else {
     var date = moment(event.date, "DD MM YY").format("DD.MM.YY");
-    var day = moment().day(date).format("dddd");
+    var day = moment(date, "DD MM YY").format("dddd");
     async.parallel({
         attendance: function(parallelCB) {
           attendanceLib.getAttendanceForDay(date, parallelCB);
