@@ -1,17 +1,17 @@
 'use strict';
 
 module.exports = {
-  create            : create,
-  read              : read,
-  readAttendee      : readAttendee,
-  getAttendee       : getAttendee,
-  getAttendees      : getAttendees,
-  getAttendeeForDay : getAttendeeForDay
+  create                    : create,
+  read                      : read,
+  readAttendee              : readAttendee,
+  getAttendee               : getAttendee,
+  getAttendees              : getAttendees,
+  getAttendeeForDay         : getAttendeeForDay,
+  reduceAttendeesListBySlot : reduceAttendeesListBySlot
 };
 
 var async           = require('async');
 var _               = require('underscore');
-var moment          = require('moment');
 var util            = require('./util');
 var db              = require('./db');
 var config          = require('./config');
@@ -121,11 +121,29 @@ function create(event, cb) {
 }
 
 function readAttendee(event, cb) {
-  var attendee = {
-    date: event.date,
-    userId: event.userId
-  };
-  getAttendeeForDay(attendee, cb);
+  if (event.userId) {
+    var attendee = {
+      date: event.date,
+      userId: event.userId
+    };
+    getAttendeeForDay(attendee, cb);
+  } else {
+    readAttendees(event.date, cb);
+  }
+}
+
+function readAttendees(date, cb) {
+  async.waterfall([
+      function(waterfallCB) {
+        getAttendees(date, waterfallCB);
+      },
+      function(result, waterfallCB) {
+        waterfallCB(null, reduceAttendeesListBySlot(result));
+      }
+    ],
+    function(err, result) {
+      return cb(err, result);
+    });
 }
 
 function createAttendee(attendee, cb) {
@@ -185,6 +203,17 @@ function getAttendee(attendee, cb) {
     }
   };
   return db.query(params, cb);
+}
+
+function reduceAttendeesListBySlot(attendees) {
+  var list = {};
+  _.each(attendees, function(user) {
+    if (user.attending) {
+      list[user.slotId] = list[user.slotId] || [];
+      list[user.slotId].push(user.name);
+    }
+  });
+  return list;
 }
 
 function getAttendees(date, cb) {

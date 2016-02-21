@@ -32,14 +32,7 @@ function read(event, cb) {
         }
       },
       function(err, results) {
-        var attendees = {};
-        _.each(results.attendees, function(user) {
-          if (user.attending) {
-            attendees[user.slotId] = attendees[user.slotId] || [];
-            attendees[user.slotId].push(user.name);
-          }
-        });
-        results.attendees = attendees;
+        results.attendees = attendeesLib.reduceAttendeesListBySlot(results.attendees);
         util.log.info("Results : ", results);
         return cb(err, results);
       }
